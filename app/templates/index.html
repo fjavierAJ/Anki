@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Generador automático de tarjetas Anki</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>Generador automático de tarjetas Anki</h1>
+        <p>
+          Pega tus apuntes o listas de términos y genera un archivo listo para
+          importar en Anki. Se detectan pares <em>término - definición</em> y
+          se crean tarjetas de cloze automáticamente cuando es posible.
+        </p>
+      </header>
+
+      <form method="post" class="controls">
+        <label for="notes">Contenido a analizar</label>
+        <textarea
+          id="notes"
+          name="notes"
+          rows="10"
+          placeholder="Ejemplo:\nATP - Molécula que almacena energía\nLa mitocondria es el orgánulo encargado de la respiración celular."
+        >{{ text }}</textarea>
+
+        <div class="options">
+          <div>
+            <label for="min_length">Longitud mínima del término cloze</label>
+            <input
+              type="number"
+              id="min_length"
+              name="min_length"
+              min="3"
+              value="{{ min_length }}"
+            />
+          </div>
+          <div>
+            <label for="max_cards">Límite de tarjetas (vacío = sin límite)</label>
+            <input
+              type="number"
+              id="max_cards"
+              name="max_cards"
+              min="1"
+              value="{{ max_cards }}"
+            />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="submit" name="action" value="preview">Generar vista previa</button>
+          <button type="submit" name="action" value="download" class="secondary">
+            Descargar TSV
+          </button>
+        </div>
+      </form>
+
+      {% if error %}
+      <div class="alert">{{ error }}</div>
+      {% endif %}
+
+      {% if cards %}
+      <section class="results">
+        <h2>{{ cards|length }} tarjetas generadas</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Frontal</th>
+              <th>Reverso</th>
+              <th>Origen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for card in cards %}
+            <tr>
+              <td>{{ card.front }}</td>
+              <td>{{ card.back }}</td>
+              <td>{{ card.source }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+      {% endif %}
+    </main>
+  </body>
+</html>
